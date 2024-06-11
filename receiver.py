@@ -22,24 +22,26 @@ if os.path.exists(file_name):
 
 # Criando o socket UDP
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(("localhost", PORT_NUMBER))
+
+# recebe de qualquer endereço ip
+sock.bind(("0.0.0.0", PORT_NUMBER))
 
 # Abrindo o arquivo para escrita
 with open(file_name, "wb") as file:
     # Recebendo e salvando os pacotes
-    sequence_number = 0
     while True:
         packet, addr = sock.recvfrom(101)  # 100 bytes de dados + 1 byte de cabeçalho
         header = int(chr(packet[0]))
-        if sequence_number == header:
-            data = packet[1:]
-            # Enviando ACK
-            ack = str(sequence_number + 2).encode()  # ACK = sequence_number + 2
+        if header == 0 or header == 1:
+            data = packet[1:]  # 0
+            ack = str(header + 2).encode()  # ACK = header + 2
             sock.sendto(ack, addr)
-            if not data:
+            if len(data) > 0:  # 90
+                file.write(data)
+                if len(data) < 100:
+                    break
+            else:
                 break
-            file.write(data)
-            sequence_number = (sequence_number + 1) % 2
 
 print("Arquivo recebido com sucesso.")
 sock.close()
