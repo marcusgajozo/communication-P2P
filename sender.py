@@ -59,7 +59,7 @@ with open(file_path, "rb") as file:
             else:
                 print("Erro: ACK inválido recebido.")
         sequence_number = (sequence_number + 1) % 2
-        if len(data) < 100:
+        if len(data) < 100 or len(data) == 0:
             break
 
 print("Arquivo enviado com sucesso.")
